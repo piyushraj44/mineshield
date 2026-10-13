@@ -1,0 +1,481 @@
+{
+  "available": true,
+  "generated_at": "2026-10-13T16:38:15Z",
+  "setup": {
+    "test_seeds": [
+      3000,
+      3001,
+      3002,
+      3003,
+      3004,
+      3005,
+      3006,
+      3007,
+      3008,
+      3009,
+      3010,
+      3011,
+      3012,
+      3013,
+      3014,
+      3015
+    ],
+    "episodes": 16,
+    "episode_duration_s": 1800.0,
+    "events_per_episode": 3,
+    "events_total": 48,
+    "train_seeds": [
+      1000,
+      1001,
+      1002,
+      1003,
+      1004
+    ],
+    "validation_seeds": [
+      2000,
+      2001
+    ],
+    "matching_rule": "An alert matches an event if it opens within [onset, end + 30 s] and shares \u22651 shield.",
+    "sim_params": {
+      "n_shields": 12,
+      "legs_per_shield": 2,
+      "noise_bar": 2.0,
+      "load_trend_bar_per_h": 0
+    },
+    "difficult_case_seeds": [
+      4000,
+      4001,
+      4002,
+      4003,
+      4004,
+      4005
+    ]
+  },
+  "methods": [
+    {
+      "id": "fixed_threshold",
+      "label": "Fixed threshold (baseline)",
+      "description": "Raises a process alert when a leg stays above the illustrative 380 bar limit (or below 150 bar while loaded) for 2 consecutive samples; it uses no other rule, no AI and no sensor-fault handling.",
+      "precision": 1.0,
+      "recall": 0.25,
+      "f1": 0.4,
+      "fp_per_hour": 0.0,
+      "median_delay_s": 54.0,
+      "tp_events": 12,
+      "fn_events": 36,
+      "alerts_total": 13,
+      "matched_alerts": 13,
+      "false_alerts": 0,
+      "runtime_ms_per_step": 0.561
+    },
+    {
+      "id": "rolling_mad",
+      "label": "Rolling MAD (baseline)",
+      "description": "Raises a process alert when a loaded leg's robust z-score against its rolling 60-s median (MAD scale) exceeds 6 for 3 consecutive samples; it cannot distinguish sensor faults or data loss from pressure changes.",
+      "precision": 1.0,
+      "recall": 0.2708,
+      "f1": 0.4262,
+      "fp_per_hour": 0.0,
+      "median_delay_s": 122.0,
+      "tp_events": 13,
+      "fn_events": 35,
+      "alerts_total": 14,
+      "matched_alerts": 14,
+      "false_alerts": 0,
+      "runtime_ms_per_step": 0.619
+    },
+    {
+      "id": "isolation_forest",
+      "label": "Isolation Forest only",
+      "description": "Raises a process alert when the Isolation Forest score (trained on normal-only synthetic data) of a loaded leg stays at or above the calibrated threshold 1.0 for 5 consecutive scored samples; samples that cannot be scored (missing data, shields not loaded for at least 30 s) never alert.",
+      "precision": 0.9189,
+      "recall": 0.5,
+      "f1": 0.6476,
+      "fp_per_hour": 0.375,
+      "median_delay_s": 34.0,
+      "tp_events": 24,
+      "fn_events": 24,
+      "alerts_total": 37,
+      "matched_alerts": 34,
+      "false_alerts": 3,
+      "runtime_ms_per_step": 1.073
+    },
+    {
+      "id": "mineshield_hybrid",
+      "label": "MineShield hybrid (rules + AI)",
+      "description": "Combines the ten engineering rules (process, sensor and telemetry) with the Isolation Forest trigger, groups triggers into alerts by category and adjacent shields, and drops process triggers on channels with a recent sensor or telemetry fault (sensor-first suppression).",
+      "precision": 0.9153,
+      "recall": 1.0,
+      "f1": 0.9558,
+      "fp_per_hour": 0.625,
+      "median_delay_s": 4.0,
+      "tp_events": 48,
+      "fn_events": 0,
+      "alerts_total": 59,
+      "matched_alerts": 54,
+      "false_alerts": 5,
+      "runtime_ms_per_step": 1.152
+    }
+  ],
+  "by_scenario": {
+    "fixed_threshold": {
+      "gradual_rise": {
+        "events": 6,
+        "detected": 4,
+        "recall": 0.6667,
+        "median_delay_s": 256.5
+      },
+      "pressure_spike": {
+        "events": 6,
+        "detected": 3,
+        "recall": 0.5,
+        "median_delay_s": 3.0
+      },
+      "leakage": {
+        "events": 6,
+        "detected": 0,
+        "recall": 0.0,
+        "median_delay_s": null
+      },
+      "leg_imbalance": {
+        "events": 5,
+        "detected": 0,
+        "recall": 0.0,
+        "median_delay_s": null
+      },
+      "multi_shield_loading": {
+        "events": 5,
+        "detected": 5,
+        "recall": 1.0,
+        "median_delay_s": 47.0
+      },
+      "sensor_spike": {
+        "events": 5,
+        "detected": 0,
+        "recall": 0.0,
+        "median_delay_s": null
+      },
+      "sensor_stuck": {
+        "events": 5,
+        "detected": 0,
+        "recall": 0.0,
+        "median_delay_s": null
+      },
+      "sensor_dropout": {
+        "events": 5,
+        "detected": 0,
+        "recall": 0.0,
+        "median_delay_s": null
+      },
+      "telemetry_interruption": {
+        "events": 5,
+        "detected": 0,
+        "recall": 0.0,
+        "median_delay_s": null
+      }
+    },
+    "rolling_mad": {
+      "gradual_rise": {
+        "events": 6,
+        "detected": 0,
+        "recall": 0.0,
+        "median_delay_s": null
+      },
+      "pressure_spike": {
+        "events": 6,
+        "detected": 4,
+        "recall": 0.6667,
+        "median_delay_s": 2.0
+      },
+      "leakage": {
+        "events": 6,
+        "detected": 0,
+        "recall": 0.0,
+        "median_delay_s": null
+      },
+      "leg_imbalance": {
+        "events": 5,
+        "detected": 3,
+        "recall": 0.6,
+        "median_delay_s": 215.0
+      },
+      "multi_shield_loading": {
+        "events": 5,
+        "detected": 4,
+        "recall": 0.8,
+        "median_delay_s": 164.0
+      },
+      "sensor_spike": {
+        "events": 5,
+        "detected": 0,
+        "recall": 0.0,
+        "median_delay_s": null
+      },
+      "sensor_stuck": {
+        "events": 5,
+        "detected": 2,
+        "recall": 0.4,
+        "median_delay_s": 123.0
+      },
+      "sensor_dropout": {
+        "events": 5,
+        "detected": 0,
+        "recall": 0.0,
+        "median_delay_s": null
+      },
+      "telemetry_interruption": {
+        "events": 5,
+        "detected": 0,
+        "recall": 0.0,
+        "median_delay_s": null
+      }
+    },
+    "isolation_forest": {
+      "gradual_rise": {
+        "events": 6,
+        "detected": 5,
+        "recall": 0.8333,
+        "median_delay_s": 118.0
+      },
+      "pressure_spike": {
+        "events": 6,
+        "detected": 4,
+        "recall": 0.6667,
+        "median_delay_s": 4.0
+      },
+      "leakage": {
+        "events": 6,
+        "detected": 6,
+        "recall": 1.0,
+        "median_delay_s": 52.0
+      },
+      "leg_imbalance": {
+        "events": 5,
+        "detected": 4,
+        "recall": 0.8,
+        "median_delay_s": 134.0
+      },
+      "multi_shield_loading": {
+        "events": 5,
+        "detected": 5,
+        "recall": 1.0,
+        "median_delay_s": 14.0
+      },
+      "sensor_spike": {
+        "events": 5,
+        "detected": 0,
+        "recall": 0.0,
+        "median_delay_s": null
+      },
+      "sensor_stuck": {
+        "events": 5,
+        "detected": 0,
+        "recall": 0.0,
+        "median_delay_s": null
+      },
+      "sensor_dropout": {
+        "events": 5,
+        "detected": 0,
+        "recall": 0.0,
+        "median_delay_s": null
+      },
+      "telemetry_interruption": {
+        "events": 5,
+        "detected": 0,
+        "recall": 0.0,
+        "median_delay_s": null
+      }
+    },
+    "mineshield_hybrid": {
+      "gradual_rise": {
+        "events": 6,
+        "detected": 6,
+        "recall": 1.0,
+        "median_delay_s": 101.5
+      },
+      "pressure_spike": {
+        "events": 6,
+        "detected": 6,
+        "recall": 1.0,
+        "median_delay_s": 1.0
+      },
+      "leakage": {
+        "events": 6,
+        "detected": 6,
+        "recall": 1.0,
+        "median_delay_s": 22.5
+      },
+      "leg_imbalance": {
+        "events": 5,
+        "detected": 5,
+        "recall": 1.0,
+        "median_delay_s": 114.0
+      },
+      "multi_shield_loading": {
+        "events": 5,
+        "detected": 5,
+        "recall": 1.0,
+        "median_delay_s": 14.0
+      },
+      "sensor_spike": {
+        "events": 5,
+        "detected": 5,
+        "recall": 1.0,
+        "median_delay_s": 1.0
+      },
+      "sensor_stuck": {
+        "events": 5,
+        "detected": 5,
+        "recall": 1.0,
+        "median_delay_s": 4.0
+      },
+      "sensor_dropout": {
+        "events": 5,
+        "detected": 5,
+        "recall": 1.0,
+        "median_delay_s": 2.0
+      },
+      "telemetry_interruption": {
+        "events": 5,
+        "detected": 5,
+        "recall": 1.0,
+        "median_delay_s": 2.0
+      }
+    }
+  },
+  "category_confusion": {
+    "method": "mineshield_hybrid",
+    "labels": [
+      "process",
+      "sensor",
+      "telemetry"
+    ],
+    "columns": [
+      "process",
+      "sensor",
+      "telemetry",
+      "missed"
+    ],
+    "matrix": [
+      [
+        28,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        15,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        5,
+        0
+      ]
+    ]
+  },
+  "difficult_cases": [
+    {
+      "name": "Noise only, no events",
+      "description": "No injected events and sensor noise raised to 5 bar; shield advances (legs lowered to about 15 bar, then re-set) are legitimate abrupt drops. Every alert is a false alert.",
+      "seed": 4000,
+      "duration_s": 1200.0,
+      "results": {
+        "fixed_threshold": "no false alerts",
+        "rolling_mad": "no false alerts",
+        "isolation_forest": "1 false alert",
+        "mineshield_hybrid": "1 false alert"
+      }
+    },
+    {
+      "name": "Gradual rise below the fixed threshold",
+      "description": "gradual_rise of 30 bar over 300 s on S09 (lowest spatial load factor) at t=590 s; the leg pressure stays well below the 380 bar fixed limit.",
+      "seed": 4001,
+      "duration_s": 1200.0,
+      "results": {
+        "fixed_threshold": "missed",
+        "rolling_mad": "missed",
+        "isolation_forest": "missed; 1 false alert",
+        "mineshield_hybrid": "detected after 315 s (process alert); 1 false alert"
+      }
+    },
+    {
+      "name": "Sensor spike resembling a pressure jump",
+      "description": "A single-sample +150 bar sensor_spike on S05-L1 at t=390 s while the shield is loaded; it resembles a sudden pressure jump but is a measurement fault.",
+      "seed": 4002,
+      "duration_s": 1200.0,
+      "results": {
+        "fixed_threshold": "missed",
+        "rolling_mad": "missed",
+        "isolation_forest": "missed",
+        "mineshield_hybrid": "detected after 1 s (sensor alert); 1 false alert"
+      }
+    },
+    {
+      "name": "Overlapping events",
+      "description": "gradual_rise (70 bar, 300 s) on S05 at t=300 s overlapping a leakage (0.8 bar/s, 150 s) on the adjacent S06-L1 at t=400 s.",
+      "seed": 4003,
+      "duration_s": 1200.0,
+      "results": {
+        "fixed_threshold": "gradual rise: detected after 237 s (process alert); leakage: missed",
+        "rolling_mad": "gradual rise: detected after 320 s (process alert); leakage: missed",
+        "isolation_forest": "gradual rise: detected after 114 s (process alert); leakage: detected after 14 s (process alert)",
+        "mineshield_hybrid": "gradual rise: detected after 114 s (process alert); leakage: detected after 14 s (process alert)"
+      }
+    },
+    {
+      "name": "Missing data during an event",
+      "description": "gradual_rise (70 bar, 300 s) on S05 at t=300 s; S05-L1 drops out for 60 s at t=450 s in the middle of the rise.",
+      "seed": 4004,
+      "duration_s": 1200.0,
+      "results": {
+        "fixed_threshold": "gradual rise: detected after 139 s (process alert); sensor dropout: missed",
+        "rolling_mad": "gradual rise: detected after 320 s (process alert); sensor dropout: missed",
+        "isolation_forest": "gradual rise: detected after 83 s (process alert); sensor dropout: missed",
+        "mineshield_hybrid": "gradual rise: detected after 83 s (process alert); sensor dropout: detected after 2 s (sensor alert)"
+      }
+    },
+    {
+      "name": "Normal transient briefly above the fixed threshold",
+      "description": "A legitimate (normal-labelled) load transient of +70 bar decaying with a 15 s time constant on S04 (highest spatial load factor) at t=340 s, briefly above the 380 bar fixed limit. It is not a ground-truth event, so every alert is a false alert.",
+      "seed": 4005,
+      "duration_s": 1200.0,
+      "results": {
+        "fixed_threshold": "1 false alert",
+        "rolling_mad": "1 false alert",
+        "isolation_forest": "1 false alert",
+        "mineshield_hybrid": "1 false alert"
+      }
+    }
+  ],
+  "limitations": [
+    "All results come from synthetic telemetry produced by this project's own simulator; nothing has been validated against real longwall shield-leg pressure data.",
+    "The simulator's physics (roof load, setting and yield behaviour, hydraulic lag, event shapes) is simplified and illustrative, and the detectors were designed with knowledge of the same simulator, which favours them compared with real data.",
+    "All thresholds (380/150 bar limits, gradients, persistence, MAD z, AI threshold) are illustrative values, not equipment specifications; they were not tuned on the test seeds, but they have not been independently validated either.",
+    "The Isolation Forest was trained only on normal-only synthetic seeds 1000-1004 and calibrated so that 1.0 is the 99.95th percentile of validation normal data; its score is a normalised anomaly score, not a probability.",
+    "Event-level metrics depend on the matching rule (alert opens within [onset, end + 30 s] and shares at least one shield): any overlapping alert counts as a detection even if it was raised for another reason, and alerts opening later than end + 30 s (e.g. on recovery transients) count as false alerts.",
+    "Each event type appears only a handful of times in the suite, so per-type recall and delays have wide uncertainty; no confidence intervals are reported.",
+    "No real sensor or network effects are modelled beyond injected faults: no latency, clock skew, re-ordering, duplicate delivery, calibration drift or temperature effects; telemetry arrives exactly once per second.",
+    "Test events are placed in non-overlapping slots on one face configuration (default shield count, legs and noise); other configurations are only covered by the difficult cases.",
+    "The baselines can only raise process alerts by design, so the category confusion is reported for the hybrid only.",
+    "Runtime per step is wall time on the machine that ran the evaluation (features, AI scoring where used, detection and correlation; simulation and telemetry validation excluded) and is indicative only."
+  ],
+  "model": {
+    "n_train_rows": 60000,
+    "n_validation_rows": 119600,
+    "trained_on": "normal-only synthetic seeds 1000-1004",
+    "validation_seeds": [
+      2000,
+      2001
+    ],
+    "n_train_rows_available": 299000,
+    "threshold_note": "score 1.0 = 99.95th percentile of validation normal data",
+    "train_time_s": 15.72,
+    "config_fingerprint": "e3e2df7c109e7a82"
+  },
+  "config_fingerprint": "e3e2df7c109e7a82",
+  "runtime_s": 62.1
+}

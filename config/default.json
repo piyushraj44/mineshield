@@ -1,0 +1,97 @@
+{
+  "version": "0.1.0",
+  "units": {"pressure": "bar", "force": "MN", "time": "s"},
+  "limits": {
+    "sensor_min_bar": 0,
+    "sensor_max_bar": 600,
+    "setting_bar": 250,
+    "high_limit_bar": 380,
+    "yield_bar": 420,
+    "low_limit_bar": 150
+  },
+  "piston_bore_m": 0.32,
+  "defaults": {"seed": 42, "n_shields": 12, "legs_per_shield": 2, "noise_bar": 2.0, "load_trend_bar_per_h": 0},
+  "ranges": {"n_shields": [6, 24], "legs_per_shield": [2, 4], "noise_bar": [0.5, 8], "load_trend_bar_per_h": [-60, 120]},
+  "speeds": [
+    {"label": "2x", "steps": 1}, {"label": "4x", "steps": 2}, {"label": "10x", "steps": 5},
+    {"label": "20x", "steps": 10}, {"label": "30x", "steps": 15}
+  ],
+  "poll_ms": 500,
+  "simulator": {
+    "dt_s": 1.0,
+    "lowered_bar": 15,
+    "roof_load_bar": 320,
+    "spatial_amplitude": 0.06,
+    "spatial_jitter": 0.03,
+    "leg_factor_sd": 0.02,
+    "leg_factor_clip": 0.05,
+    "cycle_s": 600,
+    "advance_s": 10,
+    "setting_s": 120,
+    "tau_load_s": 45,
+    "tau_hyd_s": 2.0,
+    "recovery_tau_s": 20,
+    "quantization_bar": 0.1,
+    "transient_rate_per_h": 2.0,
+    "transient_amp_bar": [6, 12],
+    "transient_tau_s": 15,
+    "shields_per_gateway": 6,
+    "start_timestamp": "2026-01-01T06:00:00Z"
+  },
+  "features": {
+    "history_s": 900,
+    "baseline_window_s": [180, 30],
+    "baseline_min_samples": 20,
+    "slope_short_s": 5,
+    "slope_long_s": 30,
+    "roll_window_s": 10,
+    "missing_window_s": 30,
+    "neighbor_radius": 2,
+    "min_loaded_s": 30,
+    "min_setting_s": 15
+  },
+  "rules": {
+    "high_pressure_bar": 380,
+    "low_pressure_bar": 150,
+    "rapid_rise_bar_s": 4.0,
+    "rapid_drop_bar_s": -0.5,
+    "imbalance_frac": 0.12,
+    "imbalance_persist_s": 10,
+    "deviation_bar": 20,
+    "deviation_persist_s": 15,
+    "pressure_persist_s": 2,
+    "stuck_run": 6,
+    "spike_jump_bar": 60,
+    "spike_return_bar": 25,
+    "missing_persist_s": 3,
+    "mad_z": 6.0,
+    "mad_window_s": 60,
+    "mad_persist_s": 3
+  },
+  "model": {
+    "features": ["pressure_bar", "dev_own_bar", "slope_5_bar_s", "slope_30_bar_s", "imbalance_frac", "neighbor_dev_bar"],
+    "n_estimators": 150,
+    "max_samples": 256,
+    "random_state": 0,
+    "max_train_rows": 60000,
+    "calibration_quantile": 0.9995,
+    "persist_s": 5,
+    "watch_score": 0.8,
+    "train_seeds": [1000, 1001, 1002, 1003, 1004],
+    "validation_seeds": [2000, 2001],
+    "episode_s": 3600
+  },
+  "alerts": {
+    "close_after_s": 60,
+    "sensor_suppress_s": 10,
+    "adjacent_merge": 1
+  },
+  "evaluation": {
+    "test_seeds_start": 3000,
+    "episodes": 16,
+    "episode_s": 1800,
+    "events_per_episode": 3,
+    "match_grace_s": 30
+  },
+  "disclaimer": "This prototype uses simulated telemetry and simplified engineering models. It is not a certified mining safety system, does not establish the probability of roof collapse, and must not be used to authorize mining operations or replace qualified personnel and approved safety procedures."
+}
