@@ -77,7 +77,7 @@ FaceSimulator (roof load + setting/advance cycle + hydraulic lag + noise + injec
   → FastAPI (/api/...) → vanilla-JS dashboard (frontend/, no build step, no external libraries)
 ```
 
-| Path | Contents |
+| Path |Contents|
 |---|---|
 | `mineshield/` | Python package: `simulator`, `telemetry`, `features`, `rules`, `model`, `alerts`, `engine`, `api`, `evaluation`, `tuning` |
 | `frontend/` | `index.html`, `styles.css`, `app.js`, `charts.js` (hand-written SVG charts), `api.js` |
