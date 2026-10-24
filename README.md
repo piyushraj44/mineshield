@@ -9,30 +9,49 @@ A simulated longwall face (12 shields × 2 hydraulic legs by default) streams le
 ## Run
 
 Requires Python 3.11+ (developed on 3.13). Runs fully offline; there are no cloud services or paid APIs.
-
+For windows:-
 ```bash
 pip install -r requirements.txt
 ```
-
 ```bash
 python run.py
 ```
-
 Open http://127.0.0.1:8000. The first start trains the anomaly model on normal-only synthetic data, which takes about 20 s; it is cached in `data/model.pkl` and retrained automatically if the model or simulator config changes.
-
 Other commands:
-
 ```bash
 python -m pytest tests -q
 ```
-
 ```bash
 python -m mineshield.evaluation
 ```
-
 ```bash
 python -m mineshield.tuning
 ```
+Alternatively for macOS/linux
+**Set up a virtual environment**
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+```bash
+pip install -r requirements.txt
+```
+```bash
+python3 run.py
+```
+Other commands:
+```bash
+pytest tests -q
+```
+```bash
+python3 -m mineshield.evaluation
+```
+```bash
+python3 -m mineshield.tuning
+```
+
+
+   
 
 - The tests are 191 unit and integration tests and take about 35 s.
 - `mineshield.evaluation` runs the held-out evaluation (about 60 s) and writes `data/eval_results.json`.
